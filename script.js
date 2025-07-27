@@ -7,48 +7,64 @@ const chatWindow = document.getElementById("chatWindow");
 chatWindow.textContent = "👋 Hello! How can I help you today?";
 
 // Store chat history as an array of messages
-let messages = [{ role: "system", content: "Answer only questions related to L’Oréal products, recommendations, brand history, brand identity, and brand values. If a user asks about any other topic, politely and cheerfully redirect the conversation to L’Oréal-related subjects. Keep answers brief, providing no more detail than necessary. Maintain a conversational, human tone; never respond as if reading from search results or a database. Instructions: - Only address queries that are directly about L’Oréal’s products, product recommendations, brand history, identity, or values. - If a question is unrelated to L’Oréal, respond cheerfully and suggest discussing something related to L’Oréal instead. - Keep responses concise and conversational, limiting detail to what is clearly relevant. - Never provide technical, encyclopedic, or robotic answers—keep tone light and friendly. - If required to redirect, do so without sounding negative or dismissive, always encouraging L’Oréal-themed conversation. Output format: - Short paragraph (1-3 sentences) in conversational, friendly English. Examples: Example 1   Input: What is the difference between L’Oréal’s Revitalift and Age Perfect moisturizers?   Output: Great question! Revitalift targets visible wrinkles and firmness, while Age Perfect is specially designed for mature skin to restore radiance. Let me know if you’d like more details or personalized recommendations! Example 2   Input: Who is the founder of L’Oréal?   Output: L’Oréal was founded by Eugène Schueller in 1909. Pretty impressive, right? Example 3  Input: Can you help me plan my trip to Paris?  Output: I’m all about beauty! If you’d like tips on L’Oréal spots to check out in Paris or want to explore our products, I’m here to help. Example 4   Input: Where are L'Oréal products made?   Output: L’Oréal products are made in several countries around the world, always following strict quality standards. If you have a specific product in mind, I can help with more details! (For real conversations, keep answers this length and style—always short, friendly, and focused on L’Oréal.) Reminder:  Answer only questions related to L’Oréal, keep responses brief and conversational, and cheerfully redirect any unrelated topics back to L’Oréal."}];
+let messages = [
+  {
+    role: "system",
+    content:
+      "Answer only questions related to L’Oréal products, recommendations, brand history, brand identity, and brand values. If a user asks about any other topic, politely and cheerfully redirect the conversation to L’Oréal-related subjects. Keep answers brief, providing no more detail than necessary. Maintain a conversational, human tone; never respond as if reading from search results or a database.",
+  },
+];
 
-// Handle form submit
+// Listen for form submission
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Get user's message
+  // Get user's message from the input box
   const userMessage = userInput.value.trim();
   if (!userMessage) return;
 
-  // Add user's message to messages array
+  // Add user's message to the messages array
   messages.push({ role: "user", content: userMessage });
 
-  // Show user's message in chat window
-  chatWindow.innerHTML += `<div class="msg user">${userMessage}</div>`;
+  // Show user's message in the chat window with "You: " prefix
+  chatWindow.innerHTML += `<div class="msg user"><b>You</b>: ${userMessage}</div>`;
 
-  // Clear input box
+  // Clear the input box
   userInput.value = "";
 
-  // Show loading message
-  chatWindow.innerHTML += `<div class="msg ai">...</div>`;
+  // Show a loading message while waiting for the AI response
+  chatWindow.innerHTML += `<div class="msg ai"><b>Assistant</b>: ...</div>`;
 
-  // Send request to OpenAI API
   try {
-    // Use your API key from secrets.js
-    const apiKey = API_KEY;
+    const workerUrl = "https://nameless-morning-3fc6.griffing.workers.dev/";
 
-    // Send POST request to OpenAI's chat completions endpoint
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch(workerUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o", // Use gpt-4o model
-        messages: messages, // Send the messages array
+        messages: messages,
       }),
     });
 
     // Parse the response as JSON
     const data = await response.json();
+
+    // Check if the response has the expected structure
+    if (
+      !data.choices ||
+      !data.choices[0] ||
+      !data.choices[0].message ||
+      !data.choices[0].message.content
+    ) {
+      // Show the error in the chat window for debugging
+      chatWindow.innerHTML += `<div class="msg ai">Sorry, there was an error.<br>Details: ${JSON.stringify(
+        data
+      )}</div>`;
+      console.error("Unexpected response format:", data);
+      return;
+    }
 
     // Get the assistant's reply
     const aiReply = data.choices[0].message.content;
@@ -56,17 +72,16 @@ chatForm.addEventListener("submit", async (e) => {
     // Add assistant's reply to messages array
     messages.push({ role: "assistant", content: aiReply });
 
-    // Remove loading message and show AI reply
-    // Remove last .msg.ai (the loading message)
+    // Remove loading message and show AI reply with "Assistant: " prefix
     const msgs = chatWindow.querySelectorAll(".msg.ai");
     if (msgs.length) msgs[msgs.length - 1].remove();
 
-    chatWindow.innerHTML += `<div class="msg ai">${aiReply}</div>`;
+    chatWindow.innerHTML += `<div class="msg ai"><b>Assistant</b>: ${aiReply}</div>`;
 
     // Scroll chat window to bottom
     chatWindow.scrollTop = chatWindow.scrollHeight;
   } catch (error) {
-    // Show error message
-    chatWindow.innerHTML += `<div class="msg ai">Sorry, there was an error connecting to OpenAI.</div>`;
+    chatWindow.innerHTML += `<div class="msg ai">Sorry, there was an error connecting to OpenAI.<br>${error}</div>`;
+    console.error("Chat error:", error);
   }
 });
