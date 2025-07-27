@@ -6,8 +6,28 @@
 }
 
 /* —— body + fonts —— */
+@font-face {
+  font-family: "Bauer Bodoni W02 Bold";
+  src: url("https://db.onlinewebfonts.com/t/769f7ac73ccca2f3528ce58459939368.eot");
+  src: url("https://db.onlinewebfonts.com/t/769f7ac73ccca2f3528ce58459939368.eot?#iefix")
+      format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/769f7ac73ccca2f3528ce58459939368.woff2")
+      format("woff2"),
+    url("https://db.onlinewebfonts.com/t/769f7ac73ccca2f3528ce58459939368.woff")
+      format("woff"),
+    url("https://db.onlinewebfonts.com/t/769f7ac73ccca2f3528ce58459939368.ttf")
+      format("truetype"),
+    url("https://db.onlinewebfonts.com/t/769f7ac73ccca2f3528ce58459939368.svg#Bauer Bodoni W02 Bold")
+      format("svg");
+}
+
+@font-face {
+  font-family: "Helvetica Now Display WO5 Rg";
+  src: url("fonts/Helvetica_Now_Display_W05_Rg.ttf") format("truetype");
+}
+
 body {
-  font-family: "Montserrat", Arial, Helvetica, sans-serif;
+  font-family: "Helvetica Now Display WO5 Rg", Arial, Helvetica, sans-serif;
   color: #333;
   display: flex;
   justify-content: center;
@@ -25,9 +45,15 @@ body {
 }
 
 .site-title {
+  font-family: "Bauer Bodoni W02 Bold", serif;
   font-size: 22px;
   font-weight: 500;
   margin-bottom: 10px;
+}
+
+.site-logo {
+  max-width: 90vw;
+  margin-bottom: 4px;
 }
 
 /* chat window */
@@ -37,7 +63,7 @@ body {
 
 .chat-window {
   height: 360px;
-  border: 1px solid #000;
+  border: 4px solid #e3a535;
   padding: 20px;
   font-size: 18px;
   line-height: 1.5;
@@ -57,7 +83,7 @@ body {
 }
 
 .msg.ai {
-  color: #666666;
+  color: #e3a535;
 }
 
 /* input row */
@@ -70,12 +96,13 @@ body {
 .chat-form input {
   flex: 1;
   padding: 12px;
-  border: 1px solid #ccc;
+  border: 2px solid #000;
+  font-family: "Helvetica Now Display WO5 Rg", Arial, Helvetica, sans-serif;
   font-size: 18px;
 }
 
 .chat-form input:focus {
-  outline: 2px solid #000;
+  outline: 2px solid #ff003b;
   outline-offset: 2px;
 }
 
@@ -99,11 +126,11 @@ body {
 }
 
 .chat-form button:hover {
-  background: #666666;
+  background: #ff003b;
 }
 
 .chat-form button:focus {
-  outline: 2px solid #000;
+  outline: 2px solid #ff003b;
   outline-offset: 2px;
 }
 
@@ -139,5 +166,5 @@ body {
 }
 
 .site-footer a:hover {
-  color: #666666;
+  color: #ff003b;
 }
